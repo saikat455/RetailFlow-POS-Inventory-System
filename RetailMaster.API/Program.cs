@@ -7,14 +7,14 @@ using POSSystem.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// PostgreSQL
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Services
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<DashboardService>();
+builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<SaleService>();
 
-// JWT Auth
 var jwtKey = builder.Configuration["Jwt:Key"]!;
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -33,11 +33,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-// CORS for React dev server
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReact", policy =>
-        // policy.WithOrigins("http://localhost:5173")
         policy.WithOrigins("http://localhost:5173", "http://localhost:5174")
               .AllowAnyHeader()
               .AllowAnyMethod());
@@ -49,7 +47,6 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Auto-run migrations on startup
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
