@@ -11,9 +11,12 @@ namespace POSSystem.Services
 
         public ProductService(AppDbContext db) => _db = db;
 
+        // Always filter out soft-deleted products
+        private IQueryable<Product> ActiveProducts => _db.Products.Where(p => !p.IsDeleted);
+
         public async Task<List<ProductResponseDto>> GetAllAsync(string? search)
         {
-            var query = _db.Products.AsQueryable();
+            var query = ActiveProducts;
 
             if (!string.IsNullOrWhiteSpace(search))
                 query = query.Where(p =>
@@ -28,13 +31,13 @@ namespace POSSystem.Services
 
         public async Task<ProductResponseDto?> GetByIdAsync(int id)
         {
-            var p = await _db.Products.FindAsync(id);
+            var p = await ActiveProducts.FirstOrDefaultAsync(x => x.Id == id);
             return p == null ? null : ToDto(p);
         }
 
         public async Task<ProductResponseDto?> GetByBarcodeAsync(string barcode)
         {
-            var p = await _db.Products.FirstOrDefaultAsync(x => x.Barcode == barcode);
+            var p = await ActiveProducts.FirstOrDefaultAsync(x => x.Barcode == barcode);
             return p == null ? null : ToDto(p);
         }
 
@@ -43,7 +46,8 @@ namespace POSSystem.Services
             if (dto.SellingPrice <= 0 || dto.PurchasePrice <= 0)
                 return (false, "Prices must be greater than 0.", null);
 
-            if (!string.IsNullOrWhiteSpace(dto.Barcode) && await _db.Products.AnyAsync(p => p.Barcode == dto.Barcode))
+            if (!string.IsNullOrWhiteSpace(dto.Barcode) &&
+                await ActiveProducts.AnyAsync(p => p.Barcode == dto.Barcode))
                 return (false, "A product with this barcode already exists.", null);
 
             var product = new Product
@@ -54,6 +58,7 @@ namespace POSSystem.Services
                 SellingPrice = dto.SellingPrice,
                 StockQty = dto.StockQty,
                 LowStockThreshold = dto.LowStockThreshold,
+                IsDeleted = false,
             };
 
             _db.Products.Add(product);
@@ -63,11 +68,11 @@ namespace POSSystem.Services
 
         public async Task<(bool success, string message)> UpdateAsync(int id, ProductUpdateDto dto)
         {
-            var product = await _db.Products.FindAsync(id);
+            var product = await ActiveProducts.FirstOrDefaultAsync(p => p.Id == id);
             if (product == null) return (false, "Product not found.");
 
             if (!string.IsNullOrWhiteSpace(dto.Barcode) && dto.Barcode != product.Barcode)
-                if (await _db.Products.AnyAsync(p => p.Barcode == dto.Barcode && p.Id != id))
+                if (await ActiveProducts.AnyAsync(p => p.Barcode == dto.Barcode && p.Id != id))
                     return (false, "Another product with this barcode already exists.");
 
             product.Name = dto.Name.Trim();
@@ -81,15 +86,13 @@ namespace POSSystem.Services
             return (true, "Product updated.");
         }
 
+        // SOFT DELETE — just sets IsDeleted = true, record stays in DB
         public async Task<(bool success, string message)> DeleteAsync(int id)
         {
-            var product = await _db.Products.FindAsync(id);
+            var product = await ActiveProducts.FirstOrDefaultAsync(p => p.Id == id);
             if (product == null) return (false, "Product not found.");
 
-            bool hasSales = await _db.SaleItems.AnyAsync(si => si.ProductId == id);
-            if (hasSales) return (false, "Cannot delete a product that has sales records.");
-
-            _db.Products.Remove(product);
+            product.IsDeleted = true;
             await _db.SaveChangesAsync();
             return (true, "Product deleted.");
         }
