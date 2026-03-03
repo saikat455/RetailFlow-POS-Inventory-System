@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import CreateCompany from './pages/CreateCompany'
 import Dashboard from './pages/Dashboard'
 import Products from './pages/Products'
 import POS from './pages/POS'
@@ -15,12 +16,13 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Public routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/unauthorized" element={<Unauthorized />} />
+          {/* Public */}
+          <Route path="/login"          element={<Login />} />
+          <Route path="/register"       element={<Register />} />
+          <Route path="/create-company" element={<CreateCompany />} />
+          <Route path="/unauthorized"   element={<Unauthorized />} />
 
-          {/* Protected routes */}
+          {/* Protected */}
           <Route path="/" element={
             <PrivateRoute>
               <MainLayout />
@@ -28,11 +30,10 @@ export default function App() {
           }>
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
-            <Route path="products" element={<Products />} />
-            <Route path="pos" element={<POS />} />
+            <Route path="products"  element={<Products />} />
+            <Route path="pos"       element={<POS />} />
           </Route>
 
-          {/* 404 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

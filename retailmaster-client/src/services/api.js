@@ -1,24 +1,41 @@
 import axios from 'axios'
 
+// Create axios instance using environment variable
 const api = axios.create({
-  baseURL: 'http://localhost:5235/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  timeout: 10000, // optional: 10 sec timeout
 })
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token')
-  if (token) config.headers.Authorization = `Bearer ${token}`
-  return config
-})
+// 🔐 Attach JWT token automatically
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token')
 
-// Auto-logout on 401
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+
+    return config
+  },
+  (error) => Promise.reject(error)
+)
+
+// 🚨 Auto logout on 401 Unauthorized
 api.interceptors.response.use(
-  res => res,
-  err => {
-    if (err.response?.status === 401) {
-      localStorage.clear()
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+
+      // Redirect to login
       window.location.href = '/login'
     }
-    return Promise.reject(err)
+
+    return Promise.reject(error)
   }
 )
 
