@@ -9,7 +9,17 @@ export function AuthProvider({ children }) {
     const name        = localStorage.getItem('name')
     const companyId   = localStorage.getItem('companyId')
     const companyName = localStorage.getItem('companyName')
-    return token ? { token, role, name, companyId: parseInt(companyId), companyName } : null
+    const branchId    = localStorage.getItem('branchId')
+    const branchName  = localStorage.getItem('branchName')
+    if (!token) return null
+    return {
+      token, role, name,
+      companyId:   parseInt(companyId),
+      companyName,
+      branchId:    branchId ? parseInt(branchId) : null,
+      branchName:  branchName || null,
+      isAdmin:     role === 'Admin',
+    }
   })
 
   const login = (data) => {
@@ -18,16 +28,23 @@ export function AuthProvider({ children }) {
     localStorage.setItem('name',        data.name)
     localStorage.setItem('companyId',   data.companyId)
     localStorage.setItem('companyName', data.companyName)
+    if (data.branchId)   localStorage.setItem('branchId',   data.branchId)
+    else                 localStorage.removeItem('branchId')
+    if (data.branchName) localStorage.setItem('branchName', data.branchName)
+    else                 localStorage.removeItem('branchName')
     setUser({
-      token: data.token, role: data.role, name: data.name,
-      companyId: data.companyId, companyName: data.companyName,
+      token:       data.token,
+      role:        data.role,
+      name:        data.name,
+      companyId:   data.companyId,
+      companyName: data.companyName,
+      branchId:    data.branchId   ?? null,
+      branchName:  data.branchName ?? null,
+      isAdmin:     data.role === 'Admin',
     })
   }
 
-  const logout = () => {
-    localStorage.clear()
-    setUser(null)
-  }
+  const logout = () => { localStorage.clear(); setUser(null) }
 
   return (
     <AuthContext.Provider value={{ user, login, logout }}>

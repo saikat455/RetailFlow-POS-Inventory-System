@@ -7,42 +7,85 @@ namespace POSSystem.Data
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        public DbSet<User> Users => Set<User>();
-        public DbSet<Product> Products => Set<Product>();
-        public DbSet<Sale> Sales => Set<Sale>();
-        public DbSet<SaleItem> SaleItems => Set<SaleItem>();
+        public DbSet<Company>       Companies      => Set<Company>();
+        public DbSet<Branch>        Branches       => Set<Branch>();
+        public DbSet<User>          Users          => Set<User>();
+        public DbSet<Product>       Products       => Set<Product>();
+        public DbSet<BranchProduct> BranchProducts => Set<BranchProduct>();
+        public DbSet<Sale>          Sales          => Set<Sale>();
+        public DbSet<SaleItem>      SaleItems      => Set<SaleItem>();
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder mb)
         {
-            modelBuilder.Entity<User>()
-                .HasIndex(u => u.Email)
-                .IsUnique();
+            // ── Company ──────────────────────────────────────
+            mb.Entity<Company>()
+              .HasIndex(c => c.InviteCode).IsUnique();
+            mb.Entity<Company>()
+              .HasQueryFilter(c => !c.IsDeleted);
 
-            modelBuilder.Entity<Sale>()
-                .HasOne(s => s.User)
-                .WithMany()
-                .HasForeignKey(s => s.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+            // ── Branch ───────────────────────────────────────
+            mb.Entity<Branch>()
+              .HasOne(b => b.Company).WithMany()
+              .HasForeignKey(b => b.CompanyId).OnDelete(DeleteBehavior.Restrict);
+            mb.Entity<Branch>()
+              .HasIndex(b => b.InviteCode).IsUnique();
+            mb.Entity<Branch>()
+              .HasQueryFilter(b => !b.IsDeleted);
 
-            modelBuilder.Entity<SaleItem>()
-                .HasOne(si => si.Sale)
-                .WithMany(s => s.SaleItems)
-                .HasForeignKey(si => si.SaleId);
+            // ── User ─────────────────────────────────────────
+            mb.Entity<User>()
+              .HasIndex(u => u.Email).IsUnique();
+            mb.Entity<User>()
+              .HasOne(u => u.Company).WithMany(c => c.Users)
+              .HasForeignKey(u => u.CompanyId).OnDelete(DeleteBehavior.Restrict);
+            mb.Entity<User>()
+              .HasOne(u => u.Branch).WithMany(b => b.Users)
+              .HasForeignKey(u => u.BranchId).OnDelete(DeleteBehavior.SetNull);
+            mb.Entity<User>()
+              .HasQueryFilter(u => !u.IsDeleted);
 
-            modelBuilder.Entity<SaleItem>()
-                .HasOne(si => si.Product)
-                .WithMany()
-                .HasForeignKey(si => si.ProductId)
-                .OnDelete(DeleteBehavior.Restrict);
+            // ── Product (catalogue only, no stock) ───────────
+            mb.Entity<Product>()
+              .HasOne(p => p.Company).WithMany()
+              .HasForeignKey(p => p.CompanyId).OnDelete(DeleteBehavior.Restrict);
+            mb.Entity<Product>()
+              .HasQueryFilter(p => !p.IsDeleted);
 
-            // Seed some sample products for demo
-            modelBuilder.Entity<Product>().HasData(
-                new Product { Id = 1, Name = "Coca Cola 1L", Barcode = "5000112637922", PurchasePrice = 25, SellingPrice = 40, StockQty = 3, LowStockThreshold = 5, CreatedDate = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
-                new Product { Id = 2, Name = "Lays Chips Classic", Barcode = "0028400047685", PurchasePrice = 15, SellingPrice = 25, StockQty = 20, LowStockThreshold = 5, CreatedDate = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
-                new Product { Id = 3, Name = "Mineral Water 500ml", Barcode = "8901234567890", PurchasePrice = 8, SellingPrice = 15, StockQty = 4, LowStockThreshold = 10, CreatedDate = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
-                new Product { Id = 4, Name = "Bread Loaf", Barcode = "1234567890123", PurchasePrice = 30, SellingPrice = 45, StockQty = 8, LowStockThreshold = 5, CreatedDate = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
-                new Product { Id = 5, Name = "Milk 1L Tetra", Barcode = "9876543210987", PurchasePrice = 55, SellingPrice = 75, StockQty = 2, LowStockThreshold = 5, CreatedDate = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) }
-            );
+            // ── BranchProduct ─────────────────────────────────
+            // Unique: one stock row per (Branch × Product)
+            mb.Entity<BranchProduct>()
+              .HasIndex(bp => new { bp.BranchId, bp.ProductId }).IsUnique();
+            mb.Entity<BranchProduct>()
+              .HasOne(bp => bp.Branch).WithMany()
+              .HasForeignKey(bp => bp.BranchId).OnDelete(DeleteBehavior.Restrict);
+            mb.Entity<BranchProduct>()
+              .HasOne(bp => bp.Product).WithMany(p => p.BranchStocks)
+              .HasForeignKey(bp => bp.ProductId).OnDelete(DeleteBehavior.Cascade);
+
+            // ── Sale ─────────────────────────────────────────
+            mb.Entity<Sale>()
+              .HasOne(s => s.Company).WithMany()
+              .HasForeignKey(s => s.CompanyId).OnDelete(DeleteBehavior.Restrict);
+            mb.Entity<Sale>()
+              .HasOne(s => s.Branch).WithMany(b => b.Sales)
+              .HasForeignKey(s => s.BranchId).OnDelete(DeleteBehavior.Restrict);
+            mb.Entity<Sale>()
+              .HasOne(s => s.User).WithMany()
+              .HasForeignKey(s => s.UserId).OnDelete(DeleteBehavior.Restrict);
+            mb.Entity<Sale>()
+              .HasIndex(s => s.InvoiceNo).IsUnique();
+            mb.Entity<Sale>()
+              .HasQueryFilter(s => !s.IsDeleted);
+
+            // ── SaleItem ─────────────────────────────────────
+            mb.Entity<SaleItem>()
+              .HasOne(si => si.Sale).WithMany(s => s.SaleItems)
+              .HasForeignKey(si => si.SaleId).OnDelete(DeleteBehavior.Cascade);
+            mb.Entity<SaleItem>()
+              .HasOne(si => si.Product).WithMany()
+              .HasForeignKey(si => si.ProductId).OnDelete(DeleteBehavior.Restrict);
+            mb.Entity<SaleItem>()
+              .HasQueryFilter(si => !si.IsDeleted);
         }
     }
 }

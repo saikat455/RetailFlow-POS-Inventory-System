@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using POSSystem.Data;
@@ -11,9 +12,11 @@ using POSSystem.Data;
 namespace POSSystem.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260304045531_AddBranchInviteCode")]
+    partial class AddBranchInviteCode
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -77,48 +80,6 @@ namespace POSSystem.Migrations
                     b.ToTable("Branches");
                 });
 
-            modelBuilder.Entity("POSSystem.Models.BranchProduct", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("BranchId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("CompanyId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("LowStockThreshold")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("StockQty")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("BranchId", "ProductId")
-                        .IsUnique();
-
-                    b.ToTable("BranchProducts");
-                });
-
             modelBuilder.Entity("POSSystem.Models.Company", b =>
                 {
                     b.Property<int>("Id")
@@ -149,9 +110,6 @@ namespace POSSystem.Migrations
 
                     b.Property<string>("Phone")
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -184,6 +142,9 @@ namespace POSSystem.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<int>("LowStockThreshold")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -193,6 +154,9 @@ namespace POSSystem.Migrations
 
                     b.Property<decimal>("SellingPrice")
                         .HasColumnType("numeric");
+
+                    b.Property<int>("StockQty")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -374,25 +338,6 @@ namespace POSSystem.Migrations
                     b.Navigation("Company");
                 });
 
-            modelBuilder.Entity("POSSystem.Models.BranchProduct", b =>
-                {
-                    b.HasOne("POSSystem.Models.Branch", "Branch")
-                        .WithMany()
-                        .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("POSSystem.Models.Product", "Product")
-                        .WithMany("BranchStocks")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Branch");
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("POSSystem.Models.Product", b =>
                 {
                     b.HasOne("POSSystem.Models.Branch", "Branch")
@@ -483,11 +428,6 @@ namespace POSSystem.Migrations
             modelBuilder.Entity("POSSystem.Models.Company", b =>
                 {
                     b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("POSSystem.Models.Product", b =>
-                {
-                    b.Navigation("BranchStocks");
                 });
 
             modelBuilder.Entity("POSSystem.Models.Sale", b =>

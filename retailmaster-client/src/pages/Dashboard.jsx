@@ -39,7 +39,7 @@ export default function Dashboard() {
       .finally(() => setLoading(false))
   }, [])
 
-  const maxQty = data?.topProducts?.[0]?.totalQtySold || 1
+  const maxQty = data?.topProducts?.[0]?.qtySold || 1
 
   return (
     <div className="max-w-[1100px]">
@@ -65,7 +65,7 @@ export default function Dashboard() {
 
       {/* Stat Cards */}
       <div className="grid grid-cols-4 gap-4 mb-6">
-        <StatCard icon="bi-currency-dollar" label="Today's Sales"    value={fmt(data?.todaySales)}        color="blue"   loading={loading} />
+        <StatCard icon="bi-currency-dollar" label="Today's Sales"    value={fmt(data?.todayRevenue)}        color="blue"   loading={loading} />
         <StatCard icon="bi-graph-up-arrow"  label="Today's Profit"   value={fmt(data?.todayProfit)}       color="green"  loading={loading} />
         <StatCard icon="bi-receipt"         label="Transactions"     value={data?.todayTransactions ?? '—'} color="indigo" loading={loading} />
         <StatCard icon="bi-exclamation-triangle-fill" label="Low Stock Alerts" value={data?.lowStockCount ?? '—'} color="red" loading={loading} />
@@ -84,20 +84,20 @@ export default function Dashboard() {
             <div className="h-36 bg-gray-50 rounded-xl animate-pulse" />
           ) : (
             <div className="flex items-end gap-2 h-40 pb-6">
-              {data?.salesTrend?.map((day, i) => {
-                const maxS = Math.max(...(data.salesTrend.map(d => d.sales)), 1)
-                const h = Math.max((day.sales / maxS) * 110, 4)
+              {data?.trend?.map((day, i) => {
+                const maxS = Math.max(...(data.trend.map(d => d.totalSales)), 1)
+                const h = Math.max((day.totalSales / maxS) * 110, 4)
                 return (
                   <div key={i} className="flex-1 flex flex-col items-center gap-1.5 relative group">
                     {/* Tooltip */}
                     <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[11px] px-2.5 py-1.5 rounded-lg whitespace-nowrap hidden group-hover:block z-10 leading-relaxed">
                       <strong>{day.date}</strong><br />
-                      Sales: {fmt(day.sales)}<br />
-                      Profit: {fmt(day.profit)}
+                      Sales: {fmt(day.totalSales)}<br />
+                      Transactions: {day.transactions}
                     </div>
                     <div
                       className="w-full rounded-t-md transition-all duration-300 cursor-pointer hover:opacity-75"
-                      style={{ height: `${h}px`, background: day.sales > 0 ? '#4f7cff' : '#e9ecf5' }}
+                      style={{ height: `${h}px`, background: day.totalSales > 0 ? '#4f7cff' : '#e9ecf5' }}
                     />
                     <span className="text-[10px] text-gray-400 font-mono">{day.date.split(' ')[1]}</span>
                   </div>
@@ -131,15 +131,15 @@ export default function Dashboard() {
                   <div key={i} className="flex items-center gap-2.5">
                     <span className="text-[11px] font-bold font-mono text-gray-300 w-4">#{i+1}</span>
                     <div className="flex-1 min-w-0">
-                      <div className="text-xs font-semibold text-gray-700 truncate mb-1">{p.name}</div>
+                      <div className="text-xs font-semibold text-gray-700 truncate mb-1">{p.productName}</div>
                       <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                         <div className="h-full bg-blue-500 rounded-full transition-all duration-500"
-                          style={{ width: `${(p.totalQtySold / maxQty) * 100}%` }} />
+                          style={{ width: `${(p.qtySold / maxQty) * 100}%` }} />
                       </div>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <div className="text-[11px] font-semibold text-blue-500">{p.totalQtySold} sold</div>
-                      <div className="text-[10px] font-mono text-gray-400">{fmt(p.totalRevenue)}</div>
+                      <div className="text-[11px] font-semibold text-blue-500">{p.qtySold} sold</div>
+                      <div className="text-[10px] font-mono text-gray-400">{fmt(p.revenue)}</div>
                     </div>
                   </div>
                 ))}
@@ -170,7 +170,7 @@ export default function Dashboard() {
               <div className="flex flex-col gap-2">
                 {data.lowStockItems.map((item, i) => (
                   <div key={i} className="flex items-center justify-between px-3 py-2 bg-amber-50 border border-amber-100 rounded-lg">
-                    <span className="text-xs font-semibold text-gray-700 truncate">{item.name}</span>
+                    <span className="text-xs font-semibold text-gray-700 truncate">{item.productName}</span>
                     <div className="flex items-center gap-2 flex-shrink-0 ml-2">
                       <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${item.stockQty === 0 ? 'bg-red-100 text-red-500' : 'bg-amber-100 text-amber-600'}`}>
                         {item.stockQty === 0 ? 'Out' : `${item.stockQty} left`}

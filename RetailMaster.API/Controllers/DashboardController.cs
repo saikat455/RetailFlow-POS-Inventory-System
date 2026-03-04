@@ -9,18 +9,16 @@ namespace POSSystem.Controllers
     [Authorize]
     public class DashboardController : ControllerBase
     {
-        private readonly DashboardService _dashboardService;
+        private readonly DashboardService _dashboard;
 
-        public DashboardController(DashboardService dashboardService)
-        {
-            _dashboardService = dashboardService;
-        }
+        public DashboardController(DashboardService dashboard) => _dashboard = dashboard;
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var data = await _dashboardService.GetDashboardAsync();
-            return Ok(data);
+            // CompanyId scoped inside DashboardService via ICurrentCompanyService
+            var result = await _dashboard.GetAsync();
+            return Ok(result);
         }
     }
 }

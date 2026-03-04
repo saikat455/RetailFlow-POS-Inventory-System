@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using POSSystem.DTOs;
@@ -11,30 +10,36 @@ namespace POSSystem.Controllers
     [Authorize]
     public class SalesController : ControllerBase
     {
-        private readonly SaleService _saleService;
-
-        public SalesController(SaleService saleService)
-        {
-            _saleService = saleService;
-        }
+        private readonly SaleService _sales;
+        public SalesController(SaleService sales) => _sales = sales;
 
         [HttpPost]
         public async Task<IActionResult> CreateSale(CreateSaleDto dto)
         {
-            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!int.TryParse(userIdStr, out int userId))
-                return Unauthorized(new { message = "Invalid token." });
-
-            var (success, message, data) = await _saleService.CreateSaleAsync(dto, userId);
-            if (!success) return BadRequest(new { message });
-            return Ok(data);
+            var (success, message, data) = await _sales.CreateSaleAsync(dto);
+            return success ? Ok(data) : BadRequest(new { message });
         }
 
+        // Fix 1: GetRecentSalesAsync now accepts optional branchId
         [HttpGet("recent")]
-        public async Task<IActionResult> GetRecent([FromQuery] int take = 20)
+        public async Task<IActionResult> GetRecentSales(
+            [FromQuery] int take = 20,
+            [FromQuery] int? branchId = null) =>
+            Ok(await _sales.GetRecentSalesAsync(take, branchId));
+
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            var sales = await _saleService.GetRecentSalesAsync(take);
-            return Ok(sales);
+            var result = await _sales.GetByIdAsync(id);
+            return result == null ? NotFound(new { message = "Sale not found." }) : Ok(result);
+        }
+
+        // Fix 2: uses GetByInvoiceNoAsync — make sure SaleService has this method
+        [HttpGet("invoice/{invoiceNo}")]
+        public async Task<IActionResult> GetByInvoice(string invoiceNo)
+        {
+            var result = await _sales.GetByInvoiceNoAsync(invoiceNo);
+            return result == null ? NotFound(new { message = "Invoice not found." }) : Ok(result);
         }
     }
 }
