@@ -20,13 +20,14 @@ builder.Services.AddHttpContextAccessor();
 
 // ── All services ──────────────────────────────────────────────
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<GoogleAuthService>();        // ← NEW
 builder.Services.AddScoped<ICurrentCompanyService, CurrentCompanyService>();
 builder.Services.AddScoped<BranchService>();
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<SaleService>();
 builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<SalesReportService>();
-builder.Services.AddScoped<SettingsService>();   // ← NEW
+builder.Services.AddScoped<SettingsService>();
 
 var jwtKey      = builder.Configuration["Jwt:Key"]      ?? throw new InvalidOperationException("Jwt:Key missing.");
 var jwtIssuer   = builder.Configuration["Jwt:Issuer"]   ?? "POSProAPI";
