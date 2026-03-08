@@ -7,9 +7,9 @@ const fmtN = (n) => Number(n || 0).toFixed(2)
 
 export default function Invoice() {
   const { invoiceNo } = useParams()
-  const [sale, setSale]     = useState(null)
+  const [sale, setSale]       = useState(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError]   = useState('')
+  const [error, setError]     = useState('')
 
   useEffect(() => {
     api.get(`/sales/invoice/${invoiceNo}`)
@@ -19,19 +19,19 @@ export default function Invoice() {
   }, [invoiceNo])
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-gray-400 text-sm flex items-center gap-2">
-        <i className="bi bi-arrow-repeat animate-spin" /> Loading invoice...
+    <div className="min-h-screen flex items-center justify-center bg-base-200">
+      <div className="text-base-content/40 text-sm flex items-center gap-2">
+        <span className="loading loading-spinner loading-sm" /> Loading invoice…
       </div>
     </div>
   )
 
   if (error || !sale) return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white rounded-2xl p-10 text-center shadow-sm">
-        <i className="bi bi-receipt text-4xl text-gray-300 block mb-3" />
-        <p className="text-gray-500 font-semibold mb-1">Invoice not found</p>
-        <p className="text-xs text-gray-400">{invoiceNo}</p>
+    <div className="min-h-screen flex items-center justify-center bg-base-200">
+      <div className="card bg-base-100 p-10 text-center shadow-sm">
+        <i className="bi bi-receipt text-4xl text-base-content/20 block mb-3" />
+        <p className="text-base-content/60 font-semibold mb-1">Invoice not found</p>
+        <p className="text-xs text-base-content/40">{invoiceNo}</p>
       </div>
     </div>
   )
@@ -40,35 +40,30 @@ export default function Invoice() {
 
   return (
     <>
-      {/* Print action bar — hidden on print */}
-      <div className="print:hidden bg-gray-100 border-b border-gray-200 px-6 py-3 flex items-center justify-between sticky top-0 z-10">
+      {/* Print action bar */}
+      <div className="print:hidden bg-base-200 border-b border-base-300 px-6 py-3 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-3">
           <button onClick={() => window.history.back()}
-            className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 bg-transparent border-0 cursor-pointer font-[inherit]">
+            className="btn btn-ghost btn-sm gap-1.5 text-base-content/60">
             <i className="bi bi-arrow-left" /> Back
           </button>
-          <span className="text-gray-300">|</span>
-          <span className="text-sm font-semibold text-gray-700">{sale.invoiceNo}</span>
+          <span className="text-base-content/20">|</span>
+          <span className="text-sm font-semibold text-base-content">{sale.invoiceNo}</span>
         </div>
-        <button onClick={() => window.print()}
-          className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer border-0 font-[inherit] transition-colors">
+        <button onClick={() => window.print()} className="btn btn-primary btn-sm gap-2">
           <i className="bi bi-printer-fill" /> Print Invoice
         </button>
       </div>
 
       {/* Invoice paper */}
-      <div className="bg-gray-100 min-h-screen py-8 print:py-0 print:bg-white">
-        <div id="invoice-paper"
-          className="bg-white mx-auto shadow-lg print:shadow-none"
+      <div className="bg-base-200 min-h-screen py-8 print:py-0 print:bg-white">
+        <div id="invoice-paper" className="bg-white mx-auto shadow-lg print:shadow-none"
           style={{ width: '210mm', minHeight: '297mm', padding: '14mm 16mm' }}>
 
-          {/* ── Header ── */}
+          {/* Header */}
           <div className="flex items-start justify-between pb-6 border-b-2 border-gray-900">
-            {/* Company info */}
             <div>
-              <div className="text-2xl font-black text-gray-900 tracking-tight mb-1">
-                {sale.companyName}
-              </div>
+              <div className="text-2xl font-black text-gray-900 tracking-tight mb-1">{sale.companyName}</div>
               {sale.companyAddress && (
                 <div className="text-xs text-gray-500 flex items-center gap-1">
                   <i className="bi bi-geo-alt print:hidden" />{sale.companyAddress}
@@ -80,40 +75,27 @@ export default function Invoice() {
                 </div>
               )}
             </div>
-
-            {/* INVOICE label + number */}
             <div className="text-right">
-              <div className="text-3xl font-black text-gray-200 tracking-widest uppercase mb-1">
-                INVOICE
-              </div>
+              <div className="text-3xl font-black text-gray-200 tracking-widest uppercase mb-1">INVOICE</div>
               <div className="text-base font-bold text-blue-600 font-mono">{sale.invoiceNo}</div>
               <div className="text-xs text-gray-500 mt-0.5">
-                {new Date(sale.saleDate).toLocaleDateString('en-US', {
-                  year: 'numeric', month: 'long', day: 'numeric'
-                })}
+                {new Date(sale.saleDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
               </div>
               <div className="text-xs text-gray-400">
-                {new Date(sale.saleDate).toLocaleTimeString('en-US', {
-                  hour: '2-digit', minute: '2-digit'
-                })}
+                {new Date(sale.saleDate).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
               </div>
             </div>
           </div>
 
-          {/* ── Branch + Customer info ── */}
+          {/* Branch + Customer */}
           <div className="grid grid-cols-2 gap-8 py-5 border-b border-gray-100">
-            {/* Branch (From) */}
             <div>
               <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">Branch</div>
               <div className="font-semibold text-gray-800 text-sm">{sale.branchName}</div>
               {sale.branchAddress && <div className="text-xs text-gray-500 mt-0.5">{sale.branchAddress}</div>}
               {sale.branchPhone   && <div className="text-xs text-gray-500 mt-0.5">{sale.branchPhone}</div>}
-              <div className="text-xs text-gray-500 mt-0.5">
-                Cashier: <span className="font-medium text-gray-700">{sale.cashierName}</span>
-              </div>
+              <div className="text-xs text-gray-500 mt-0.5">Cashier: <span className="font-medium text-gray-700">{sale.cashierName}</span></div>
             </div>
-
-            {/* Customer (Bill To) */}
             <div>
               <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">Bill To</div>
               {sale.customerName ? (
@@ -127,7 +109,7 @@ export default function Invoice() {
             </div>
           </div>
 
-          {/* ── Items table ── */}
+          {/* Items table */}
           <div className="mt-5">
             <table className="w-full">
               <thead>
@@ -149,7 +131,6 @@ export default function Invoice() {
                     <td className="px-4 py-3 text-sm text-right font-mono font-semibold text-gray-800">{fmtN(item.subtotal)}</td>
                   </tr>
                 ))}
-                {/* Empty rows for short invoices */}
                 {sale.items.length < 5 && Array.from({ length: 5 - sale.items.length }).map((_, i) => (
                   <tr key={`empty-${i}`} className="border-b border-gray-50">
                     <td className="px-4 py-3 text-xs text-transparent">-</td>
@@ -160,7 +141,7 @@ export default function Invoice() {
             </table>
           </div>
 
-          {/* ── Totals ── */}
+          {/* Totals */}
           <div className="flex justify-end mt-4">
             <div className="w-64">
               <div className="flex justify-between text-sm py-1.5 border-b border-gray-100">
@@ -180,36 +161,27 @@ export default function Invoice() {
             </div>
           </div>
 
-          {/* ── Footer ── */}
+          {/* Footer */}
           <div className="mt-12 pt-5 border-t border-gray-100">
             <div className="flex items-start justify-between">
-              {/* Thank you note */}
               <div>
                 <div className="text-sm font-bold text-gray-800 mb-1">Thank you for your purchase!</div>
-                <div className="text-xs text-gray-400">
-                  Please keep this invoice for your records.
-                </div>
+                <div className="text-xs text-gray-400">Please keep this invoice for your records.</div>
               </div>
-              {/* Signature */}
               <div className="text-right">
                 <div className="w-32 border-b border-gray-400 mb-1 ml-auto" />
                 <div className="text-xs text-gray-500">Authorized Signature</div>
               </div>
             </div>
-
-            {/* Bottom strip */}
             <div className="mt-8 bg-gray-900 rounded-lg px-5 py-3 flex items-center justify-between">
               <div className="text-white/60 text-[11px] font-mono">{sale.invoiceNo}</div>
               <div className="text-white font-bold text-sm">{sale.companyName}</div>
-              <div className="text-white/60 text-[11px]">
-                {new Date(sale.saleDate).toLocaleDateString()}
-              </div>
+              <div className="text-white/60 text-[11px]">{new Date(sale.saleDate).toLocaleDateString()}</div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Print styles */}
       <style>{`
         @media print {
           @page { size: A4; margin: 0; }
