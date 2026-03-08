@@ -2,26 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Smooth scrollbars */
+/* Safe area for phones with home indicator */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .pb-safe {
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+}
+
+/* Smooth theme transitions */
+*, *::before, *::after {
+  transition-property: background-color, border-color, color;
+  transition-duration: 200ms;
+  transition-timing-function: ease;
+}
+.no-transition, .loading, [class*="animate-"], [class*="motion"] {
+  transition: none !important;
+}
+
+/* Scrollbars */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #dde3ef; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: #c5ccdb; }
+::-webkit-scrollbar-thumb { background: oklch(var(--bc) / 0.2); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: oklch(var(--bc) / 0.35); }
 
-/* Spinner animation for loading states */
+/* Animations */
 @keyframes spin { to { transform: rotate(360deg); } }
 .animate-spin { animation: spin 0.7s linear infinite; }
 
-/* Slide-in toast animation */
 @keyframes slideIn {
   from { transform: translateX(20px); opacity: 0; }
   to   { transform: translateX(0);    opacity: 1; }
 }
 .animate-slide-in { animation: slideIn 0.2s ease; }
 
-/* Pop-in modal animation */
 @keyframes popIn {
   from { transform: scale(0.94); opacity: 0; }
   to   { transform: scale(1);    opacity: 1; }
 }
 .animate-pop-in { animation: popIn 0.18s ease; }
+
+/* Line clamp */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
