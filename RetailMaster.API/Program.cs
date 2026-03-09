@@ -28,6 +28,10 @@ builder.Services.AddScoped<SaleService>();
 builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<SalesReportService>();
 builder.Services.AddScoped<SettingsService>();
+// Add Email Service
+builder.Services.AddScoped<IEmailService, EmailService>();
+// Add Password Reset Service
+builder.Services.AddScoped<PasswordResetService>();
 
 var jwtKey      = builder.Configuration["Jwt:Key"]      ?? throw new InvalidOperationException("Jwt:Key missing.");
 var jwtIssuer   = builder.Configuration["Jwt:Issuer"]   ?? "POSProAPI";
@@ -53,6 +57,9 @@ builder.Services.AddAuthorization();
 var allowedOrigins = (builder.Configuration["Cors:AllowedOrigins"]
     ?? "http://localhost:5173,http://localhost:5174")
     .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+// Frontend URL for reset links
+var frontendUrl = builder.Configuration["Frontend:Url"] ?? "http://localhost:5173";
 
 builder.Services.AddCors(options =>
     options.AddPolicy("AllowReact", p =>

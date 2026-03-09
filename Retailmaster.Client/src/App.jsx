@@ -14,6 +14,8 @@ import SalesReport       from './pages/SalesReport'
 import Invoice           from './pages/Invoice'
 import Settings          from './pages/Settings'
 import NotFound          from './pages/NotFound'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 
 export default function App() {
   return (
@@ -24,6 +26,9 @@ export default function App() {
           <Route path="/login"          element={<Login />} />
           <Route path="/register"       element={<Register />} />
           <Route path="/create-company" element={<CreateCompany />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+      
 
           {/* ── Invoice — full page, no sidebar ── */}
           <Route

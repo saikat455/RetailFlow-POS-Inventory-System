@@ -14,6 +14,7 @@ namespace POSSystem.Data
         public DbSet<BranchProduct> BranchProducts => Set<BranchProduct>();
         public DbSet<Sale>          Sales          => Set<Sale>();
         public DbSet<SaleItem>      SaleItems      => Set<SaleItem>();
+        public DbSet<PasswordReset> PasswordResets => Set<PasswordReset>();
 
         protected override void OnModelCreating(ModelBuilder mb)
         {
@@ -86,6 +87,17 @@ namespace POSSystem.Data
               .HasForeignKey(si => si.ProductId).OnDelete(DeleteBehavior.Restrict);
             mb.Entity<SaleItem>()
               .HasQueryFilter(si => !si.IsDeleted);
+
+            // ── PasswordReset ─────────────────────────────────────
+            mb.Entity<PasswordReset>()
+              .HasOne(pr => pr.User)
+              .WithMany()
+              .HasForeignKey(pr => pr.UserId)
+              .OnDelete(DeleteBehavior.Cascade);
+            mb.Entity<PasswordReset>()
+              .HasIndex(pr => pr.Token).IsUnique();
+            mb.Entity<PasswordReset>()
+              .HasQueryFilter(pr => !pr.IsUsed && pr.ExpiresAt > DateTime.UtcNow);
         }
     }
 }

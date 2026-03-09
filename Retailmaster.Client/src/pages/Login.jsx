@@ -650,6 +650,12 @@ export default function Login() {
                     <i className={`bi ${showPass ? 'bi-eye-slash' : 'bi-eye'}`} />
                   </button>
                 </label>
+                {/* Inside the password form-control, after the password input */}
+<div className="flex justify-end mt-1">
+  <Link to="/forgot-password" className="text-xs text-primary hover:underline no-underline">
+    Forgot password?
+  </Link>
+</div>
               </div>
               <button type="submit" disabled={loading}
                 className="btn btn-primary w-full gap-2 mt-1">
