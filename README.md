@@ -1,127 +1,259 @@
-# RetailFlow-POS-Inventory-System
+# RetailMaster POS System
 
-A full-stack Point of Sale and Inventory Management System for small businesses with multi-tenant data isolation, role-based access, and real-time analytics.
+A comprehensive Point of Sale (POS) system with multi-branch support, inventory management, online ordering, and role-based access control.
 
-## Project Structure
+## 🚀 Features
+
+### Core POS Features
+- **Multi-branch Management**: Create and manage multiple branches under one company
+- **Role-based Access**: Admin and Cashier roles with different permissions
+- **Product Management**: Central product catalog with branch-specific inventory
+- **Sales Processing**: Fast and intuitive POS interface for cashiers
+- **Invoice Generation**: Professional PDF invoices with print support
+- **Sales Reports**: Comprehensive reports with filters and analytics
+- **Dashboard**: Real-time KPIs, low stock alerts, and sales trends
+
+### Online Ordering System
+- **Public Storefront**: Customers can browse products by branch
+- **Real-time Inventory**: Live stock availability checking
+- **Order Management**: Complete order lifecycle (Pending → Accepted → Ready → Out for Delivery → Delivered)
+- **Order Tracking**: Customers can track their orders
+- **Branch Selection**: Customers choose which branch to order from
+- **New Order Notifications**: Real-time alerts for cashiers
+
+### Authentication & Security
+- **JWT Authentication**: Secure token-based authentication
+- **Google OAuth**: Sign in with Google integration
+- **Password Reset**: Forgot password functionality with email
+- **Multi-tenancy**: Complete data isolation between companies
+
+### Inventory Management
+- **Branch-specific Stock**: Track inventory per branch
+- **Low Stock Alerts**: Automatic notifications when stock runs low
+- **Stock Adjustments**: Easy quantity and threshold management
+- **Product Catalog**: Central product database with pricing
+
+## 🏗️ Project Structure
+
+### Backend (RetailMaster.API)
 
 ```
-RetailFlow-POS-Inventory-System/
-├── retailmaster.client/          # React Frontend
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   ├── context/
-│   │   └── layouts/
-│   ├── package.json
-│   └── vite.config.js
-│
-└── retailmaster.api/             # ASP.NET Core Backend
-    ├── Controllers/
-    ├── Services/
-    ├── Models/
-    ├── DTOs/
-    ├── Data/
-    ├── Program.cs
-    └── appsettings.json
+RetailMaster.API/
+├── Controllers/
+├── DTOs/
+├── Models/
+├── Services/
+├── Data/
+├── Migrations/
+└── Program.cs
 ```
 
-## Tech Stack
+### Frontend (RetailMaster.Client)
 
-**Backend:** ASP.NET Core 8, PostgreSQL, Entity Framework Core, JWT, BCrypt  
-**Frontend:** React 18, Vite, Tailwind CSS, Axios
+```
+RetailMaster.Client/
+├── public/
+├── src/
+│   ├── components/
+│   ├── context/
+│   ├── layouts/
+│   ├── pages/
+│   │   └── Online/
+│   ├── services/
+│   ├── App.jsx
+│   ├── main.jsx
+│   └── index.css
+├── .env
+├── index.html
+├── package.json
+├── tailwind.config.js
+└── vite.config.js
+```
 
-## Core Features
+## 🛠️ Technology Stack
 
-### Multi-Tenancy
-- Complete data isolation via `CompanyId` filtering
-- Business owners create company → generate unique **Invite Code**
-- Cashiers register using invite code to join company
+### Backend
+- **.NET 9.0** - Web API framework
+- **Entity Framework Core** - ORM and database access
+- **PostgreSQL** - Primary database
+- **JWT** - Authentication
+- **BCrypt** - Password hashing
+- **Google.Apis.Auth** - Google OAuth verification
+- **Swagger/OpenAPI** - API documentation
 
-### Authentication & Roles
-- JWT-based authentication
-- **Admin:** Full access — manage products, users, inventory
-- **Cashier:** POS sales and product viewing only
+### Frontend
+- **React 18** - UI library
+- **Vite** - Build tool and dev server
+- **React Router DOM** - Routing
+- **Axios** - HTTP client
+- **Framer Motion** - Animations
+- **Tailwind CSS** - Styling
+- **DaisyUI** - UI components
+- **Bootstrap Icons** - Icon set
 
-### Dashboard
-- Today's sales, profit, transaction count
-- Low stock alerts
-- 7-day sales trend chart
-- Top selling products
-- Live low stock items list
-
-### Inventory Management (Admin)
-- Full CRUD with soft delete
-- Stock tracking with low stock thresholds
-- Profit margin auto-calculation
-
-### Point of Sale
-- Product grid with search
-- Cart with stock validation
-- Discount support
-- Transaction-safe processing
-- Automatic stock deduction
-- Receipt printing
-
-### Company Management (Admin)
-- View company details and invite code
-- Copy invite code
-- Manage team members
-
-## Quick Start
+## 📦 Installation
 
 ### Prerequisites
-- .NET 8 SDK
-- Node.js 18+
-- PostgreSQL 14+
+- [.NET 9.0 SDK](https://dotnet.microsoft.com/download)
+- [Node.js 18+](https://nodejs.org/)
+- [PostgreSQL](https://www.postgresql.org/)
+- [Git](https://git-scm.com/)
 
 ### Backend Setup
+
+1. **Clone the repository**
 ```bash
-cd retailmaster.api
-# Install DotNetEnv package
-dotnet add package DotNetEnv
-# Create .env file (see template below)
-dotnet ef database update
-dotnet run
-# API at http://localhost:5235
+git clone https://github.com/yourusername/retailmaster.git
+cd retailmaster/RetailMaster.API
 ```
+
+2. **Configure database connection**
+   
+   Update `appsettings.json` or create `appsettings.Development.json`:
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Database=retailmaster;Username=postgres;Password=yourpassword"
+  },
+  "Jwt": {
+    "Key": "your-super-secret-jwt-key-with-at-least-32-characters",
+    "Issuer": "RetailMaster",
+    "Audience": "RetailMasterUsers",
+    "ExpireMinutes": 60
+  },
+  "Google": {
+    "ClientId": "your-google-client-id.apps.googleusercontent.com"
+  },
+  "Frontend": {
+    "Url": "http://localhost:5173"
+  },
+  "Email": {
+    "SmtpHost": "smtp.gmail.com",
+    "SmtpPort": "587",
+    "SmtpUser": "your-email@gmail.com",
+    "SmtpPass": "your-app-password",
+    "FromEmail": "your-email@gmail.com",
+    "FromName": "RetailMaster"
+  }
+}
+```
+
+3. **Run migrations**
+```bash
+dotnet ef database update
+```
+
+4. **Run the API**
+```bash
+dotnet run
+```
+The API will be available at `https://localhost:7000` and Swagger UI at `https://localhost:7000/swagger`
 
 ### Frontend Setup
+
+1. **Navigate to client directory**
 ```bash
-cd retailmaster.client
-# Create .env file (see template below)
+cd ../RetailMaster.Client
+```
+
+2. **Install dependencies**
+```bash
 npm install
+```
+
+3. **Create .env file**
+```env
+VITE_API_BASE_URL=https://localhost:7000/api
+VITE_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+```
+
+4. **Run the development server**
+```bash
 npm run dev
-# App at http://localhost:5173
+```
+The app will be available at `http://localhost:5173`
+
+## 🚦 Usage Guide
+
+### For Business Owners
+1. **Create Company**: Sign up at `/create-company`
+2. **Add Branches**: Navigate to Branches page and add branches
+3. **Add Products**: Add products to catalog and assign stock to branches
+4. **Manage Staff**: View and manage users in Settings
+5. **View Reports**: Analyze sales data in Reports section
+
+### For Cashiers
+1. **Register**: Use branch invite code at `/register`
+2. **Process Sales**: Use POS interface to ring up customers
+3. **Manage Orders**: Handle online orders in the Orders dashboard
+4. **Check Inventory**: View products and stock levels
+
+### For Customers
+1. **Browse**: Visit the public site at `/online`
+2. **Select Branch**: Choose a branch to order from
+3. **Add to Cart**: Select products and quantities
+4. **Checkout**: Enter delivery details and place order
+5. **Track**: Receive order number for tracking
+
+## 🔑 Key Workflows
+
+### Online Ordering Flow
+```
+Customer → Select Branch → Browse Products → Add to Cart → 
+Checkout → Order Placed → Cashier Accepts → Ready for Pickup → 
+Out for Delivery → Delivered
 ```
 
-## Environment Variables
-
-### Backend `.env` (in `retailmaster.api/`)
+### POS Sale Flow
 ```
-ConnectionStrings__DefaultConnection=Host=localhost;Database=retailflowdb;Username=postgres;Password=yourpassword
-Jwt__Key=your-32-character-min-secret-key-here
-Jwt__Issuer=RetailFlowAPI
-Jwt__Audience=RetailFlowClient
-Cors__AllowedOrigins=http://localhost:5173
+Cashier → Select Branch → Scan/Search Products → 
+Add to Cart → Apply Discount → Complete Sale → 
+Print Invoice → Update Inventory
 ```
 
-### Frontend `.env` (in `retailmaster.client/`)
+### Inventory Management
 ```
-VITE_API_BASE_URL=http://localhost:5235/api
+Admin → Add Product → Assign to Branches → 
+Set Stock Levels → Monitor Low Stock → 
+Adjust as Needed
 ```
 
-## First Time Use
+## 📊 Database Schema
 
-| Action | URL | User |
-|--------|-----|------|
-| Create Company | `/create-company` | Business Owner |
-| Register | `/register` | Cashiers (need invite code) |
-| Login | `/login` | Everyone |
+### Core Tables
+- **Companies** - Tenant information
+- **Branches** - Branch details with invite codes
+- **Users** - Staff accounts with roles
+- **Products** - Central product catalog
+- **BranchProducts** - Branch-specific inventory
+- **Sales** - POS transactions
+- **SaleItems** - Individual sale items
+- **OnlineOrders** - Customer orders
+- **OnlineOrderItems** - Order line items
+- **PasswordResets** - Password reset tokens
 
-## Security Features
-- BCrypt password hashing
-- JWT with embedded `CompanyId` for tenant isolation
-- Soft delete on all entities
-- Role-based access control
-- Secrets excluded via `.gitignore`
+## 🔒 Security Features
+
+- **JWT Authentication** with role-based claims
+- **Password Hashing** using BCrypt
+- **Multi-tenancy** - Complete data isolation
+- **Soft Delete** - Data is never permanently deleted
+- **CORS** - Configured for specific origins
+- **Input Validation** - All DTOs validated
+- **SQL Injection Protection** - Entity Framework
+- **XSS Protection** - React's built-in escaping
+
+## 📱 Responsive Design
+
+The frontend is fully responsive and works on:
+- **Desktop** - Full sidebar layout
+- **Tablet** - Collapsible sidebar
+- **Mobile** - Bottom navigation bar
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
