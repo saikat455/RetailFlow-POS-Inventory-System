@@ -13,5 +13,6 @@ namespace POSSystem.Models
 
         public List<User> Users { get; set; } = new();
         public List<Sale> Sales { get; set; } = new();
+        public bool AcceptsOnlineOrders { get; set; } = true;
     }
 }

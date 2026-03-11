@@ -40,7 +40,7 @@
 //         adminEmail: form.adminEmail,
 //         adminPassword: form.adminPassword,
 //       })
-//       login(res.data); navigate('/dashboard')
+//       login(res.data); navigate('/app/dashboard')
 //     } catch (err) {
 //       setError(err.response?.data?.message || 'Failed to create company.')
 //     } finally { setLoading(false) }
@@ -287,7 +287,7 @@ export default function CreateCompany() {
         adminEmail:  form.adminEmail,
         adminPassword: form.adminPassword,
       })
-      login(res.data); navigate('/dashboard')
+      login(res.data); navigate('/app/dashboard')
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create company.')
     } finally { setLoading(false) }

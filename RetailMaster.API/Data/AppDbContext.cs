@@ -15,6 +15,9 @@ namespace POSSystem.Data
         public DbSet<Sale>          Sales          => Set<Sale>();
         public DbSet<SaleItem>      SaleItems      => Set<SaleItem>();
         public DbSet<PasswordReset> PasswordResets => Set<PasswordReset>();
+        public DbSet<OnlineOrder> OnlineOrders => Set<OnlineOrder>();
+public DbSet<OnlineOrderItem> OnlineOrderItems => Set<OnlineOrderItem>();
+
 
         protected override void OnModelCreating(ModelBuilder mb)
         {
@@ -98,6 +101,31 @@ namespace POSSystem.Data
               .HasIndex(pr => pr.Token).IsUnique();
             mb.Entity<PasswordReset>()
               .HasQueryFilter(pr => !pr.IsUsed && pr.ExpiresAt > DateTime.UtcNow);
+
+            // ── OnlineOrder ─────────────────────────────────────
+mb.Entity<OnlineOrder>()
+  .HasOne(o => o.Company).WithMany()
+  .HasForeignKey(o => o.CompanyId).OnDelete(DeleteBehavior.Restrict);
+mb.Entity<OnlineOrder>()
+  .HasOne(o => o.Branch).WithMany()
+  .HasForeignKey(o => o.BranchId).OnDelete(DeleteBehavior.Restrict);
+mb.Entity<OnlineOrder>()
+  .HasOne(o => o.User).WithMany()
+  .HasForeignKey(o => o.UserId).OnDelete(DeleteBehavior.SetNull);
+mb.Entity<OnlineOrder>()
+  .HasIndex(o => o.OrderNumber).IsUnique();
+mb.Entity<OnlineOrder>()
+  .HasQueryFilter(o => !o.IsDeleted);
+
+// ── OnlineOrderItem ─────────────────────────────────
+mb.Entity<OnlineOrderItem>()
+  .HasOne(i => i.OnlineOrder).WithMany(o => o.Items)
+  .HasForeignKey(i => i.OnlineOrderId).OnDelete(DeleteBehavior.Cascade);
+mb.Entity<OnlineOrderItem>()
+  .HasOne(i => i.Product).WithMany()
+  .HasForeignKey(i => i.ProductId).OnDelete(DeleteBehavior.Restrict);
+mb.Entity<OnlineOrderItem>()
+  .HasQueryFilter(i => !i.IsDeleted);
         }
     }
 }

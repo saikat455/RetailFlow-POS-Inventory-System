@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
@@ -60,7 +59,7 @@ function InviteCodeBadge({ code, onRegenerate, branchId }) {
   )
 }
 
-const emptyForm = { name: '', address: '', phone: '', isDefault: false }
+const emptyForm = { name: '', address: '', phone: '', isDefault: false, acceptsOnlineOrders: true }
 
 export default function Branches() {
   const { user } = useAuth()
@@ -82,18 +81,41 @@ export default function Branches() {
 
   const load = async () => {
     setLoading(true)
-    try { const r = await api.get('/branches'); setBranches(r.data) }
+    try { 
+      const r = await api.get('/branches'); 
+      setBranches(r.data) 
+    }
     catch { showToast('Failed to load branches.', 'error') }
     finally { setLoading(false) }
   }
 
   useEffect(() => { load() }, [])
 
+  const toggleOnlineOrders = async (branchId, currentValue) => {
+    try {
+      await api.put(`/branches/${branchId}/toggle-online`, !currentValue)
+      // Update local state
+      setBranches(prev => prev.map(b => 
+        b.id === branchId 
+          ? { ...b, acceptsOnlineOrders: !currentValue }
+          : b
+      ))
+      showToast(`Online orders ${!currentValue ? 'enabled' : 'disabled'}`, 'success')
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Failed to update setting', 'error')
+    }
+  }
+
   const openCreate = () => {
     setForm(emptyForm); setFormError(''); setEditTarget(null); setModal('create')
   }
   const openEdit = (b) => {
-    setForm({ name: b.name, address: b.address || '', phone: b.phone || '', isDefault: b.isDefault })
+    setForm({ 
+      name: b.name, 
+      address: b.address || '', 
+      phone: b.phone || '', 
+      isDefault: b.isDefault 
+    })
     setFormError(''); setEditTarget(b); setModal('edit')
   }
   const closeModal = () => { setModal(null); setEditTarget(null); setFormError('') }
@@ -309,6 +331,26 @@ export default function Branches() {
                   </div>
                 </div>
 
+                {/* Online Orders Toggle - NEW SECTION */}
+                <div className="border-t border-base-300 pt-3 sm:pt-3.5 mb-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-widest
+                      text-base-content/40 flex items-center gap-1">
+                      <i className="bi bi-globe2 text-primary" /> Online Orders
+                    </span>
+                    <button
+                      onClick={() => toggleOnlineOrders(b.id, b.acceptsOnlineOrders)}
+                      className={`btn btn-xs gap-1.5 ${b.acceptsOnlineOrders ? 'btn-success' : 'btn-ghost border border-base-300'}`}
+                    >
+                      <i className={`bi ${b.acceptsOnlineOrders ? 'bi-check-circle-fill' : 'bi-x-circle-fill'}`} />
+                      {b.acceptsOnlineOrders ? 'Enabled' : 'Disabled'}
+                    </button>
+                  </div>
+                  <p className="text-[10px] text-base-content/40 mt-1">
+                    When enabled, customers can order from this branch via the public site
+                  </p>
+                </div>
+
                 {/* Invite code */}
                 <div className="border-t border-base-300 pt-3 sm:pt-3.5">
                   <div className="flex items-center justify-between mb-2">
@@ -330,15 +372,14 @@ export default function Branches() {
         </div>
       )}
 
-      {/* Create / Edit Modal */}
+      {/* Create / Edit Modal - UPDATE THIS to include acceptsOnlineOrders */}
       <AnimatePresence>
         {modal && (
           <motion.div variants={scaleIn} initial="hidden" animate="visible" exit="exit"
-            className="card bg-base-100 w-full max-w-[460px] shadow-2xl rounded-2xl overflow-hidden"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[1000] p-4"
             onClick={closeModal}>
             <div
-              className="card bg-base-100 w-full sm:max-w-[480px] shadow-2xl
-                rounded-t-2xl sm:rounded-2xl overflow-hidden"
+              className="card bg-base-100 w-full max-w-[480px] shadow-2xl rounded-2xl overflow-hidden"
               onClick={e => e.stopPropagation()}>
               <div className="w-10 h-1 bg-base-300 rounded-full mx-auto mt-3 sm:hidden" />
               <div className="card-body p-4 sm:p-6">
@@ -400,6 +441,23 @@ export default function Branches() {
                       onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
                       placeholder="+880 1700 000000" className="input input-bordered w-full" />
                   </div>
+                  
+                  {/* Online Orders Toggle in Create/Edit Modal */}
+                  <label className="label cursor-pointer justify-start gap-3 p-3
+                    bg-base-200 rounded-xl border border-base-300
+                    hover:border-primary/30 transition-colors">
+                    <input type="checkbox" 
+                      checked={form.acceptsOnlineOrders ?? true}
+                      onChange={e => setForm(f => ({ ...f, acceptsOnlineOrders: e.target.checked }))}
+                      className="toggle toggle-primary toggle-sm" />
+                    <div>
+                      <span className="label-text font-semibold block">Accept online orders</span>
+                      <span className="label-text-alt text-base-content/50">
+                        Customers can order from this branch via the public site
+                      </span>
+                    </div>
+                  </label>
+
                   <label className="label cursor-pointer justify-start gap-3 p-3
                     bg-base-200 rounded-xl border border-base-300
                     hover:border-primary/30 transition-colors">
@@ -411,6 +469,7 @@ export default function Branches() {
                       <span className="label-text-alt text-base-content/50">Pre-selected in POS</span>
                     </div>
                   </label>
+                  
                   <div className="flex gap-3 justify-end pt-1">
                     <button type="button" onClick={closeModal}
                       className="btn btn-ghost border border-base-300">Cancel</button>
@@ -433,11 +492,10 @@ export default function Branches() {
       <AnimatePresence>
         {deleteTarget && (
           <motion.div variants={scaleIn} initial="hidden" animate="visible" exit="exit"
-            className="card bg-base-100 w-full max-w-[360px] shadow-2xl rounded-2xl overflow-hidden"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[1000] p-4"
             onClick={() => setDeleteTarget(null)}>
             <div
-              className="card bg-base-100 w-full sm:max-w-[380px] shadow-2xl
-                rounded-t-2xl sm:rounded-2xl overflow-hidden"
+              className="card bg-base-100 w-full max-w-[380px] shadow-2xl rounded-2xl overflow-hidden"
               onClick={e => e.stopPropagation()}>
               <div className="w-10 h-1 bg-base-300 rounded-full mx-auto mt-3 sm:hidden" />
               <div className="card-body p-5 sm:p-6 text-center">

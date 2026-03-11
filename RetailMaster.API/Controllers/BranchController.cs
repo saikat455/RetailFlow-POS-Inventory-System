@@ -65,5 +65,13 @@ namespace POSSystem.Controllers
             var r = await _branches.ValidateInviteCodeAsync(code);
             return r == null ? NotFound(new { message = "Invalid invite code." }) : Ok(r);
         }
+
+        [HttpPut("{id:int}/toggle-online")]
+[Authorize(Roles = "Admin")]
+public async Task<IActionResult> ToggleOnlineOrders(int id, [FromBody] bool acceptsOnline)
+{
+    var (ok, msg) = await _branches.ToggleOnlineOrdersAsync(id, acceptsOnline);
+    return ok ? Ok(new { message = msg }) : BadRequest(new { message = msg });
+}
     }
 }

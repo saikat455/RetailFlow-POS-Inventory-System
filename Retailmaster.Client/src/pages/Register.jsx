@@ -100,7 +100,7 @@
 //         setGooglePending({ email: r.data.email, name: r.data.name, idToken })
 //         setGoogleLoading(false); return
 //       }
-//       login(r.data); navigate('/dashboard')
+//       login(r.data); navigate('/app/dashboard')
 //     } catch (err) {
 //       setError(err.response?.data?.message || 'Google sign-in failed.')
 //     } finally { setGoogleLoading(false) }
@@ -112,7 +112,7 @@
 //     setGInviteLoading(true)
 //     try {
 //       const r = await api.post('/auth/google', { idToken: googlePending.idToken, inviteCode: gInviteCode })
-//       login(r.data); navigate('/dashboard')
+//       login(r.data); navigate('/app/dashboard')
 //     } catch (err) {
 //       setGInviteError(err.response?.data?.message || 'Registration failed.')
 //     } finally { setGInviteLoading(false) }
@@ -518,7 +518,7 @@ export default function Register() {
         setGooglePending({ email: r.data.email, name: r.data.name, idToken })
         setGoogleLoading(false); return
       }
-      login(r.data); navigate('/dashboard')
+      login(r.data); navigate('/app/dashboard')
     } catch (err) {
       setError(err.response?.data?.message || 'Google sign-in failed.')
     } finally { setGoogleLoading(false) }
@@ -530,7 +530,7 @@ export default function Register() {
     setGInviteLoading(true)
     try {
       const r = await api.post('/auth/google', { idToken: googlePending.idToken, inviteCode: gInviteCode })
-      login(r.data); navigate('/dashboard')
+      login(r.data); navigate('/app/dashboard')
     } catch (err) {
       setGInviteError(err.response?.data?.message || 'Registration failed.')
     } finally { setGInviteLoading(false) }

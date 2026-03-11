@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react'
-import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
+import { Outlet, NavLink, useNavigate, useLocation, Link } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
@@ -8,13 +7,14 @@ import ThemeToggle from '../components/ThemeToggle'
 import { pageTransition } from '../motion'
 
 const navItems = [
-  { to: '/dashboard',    label: 'Dashboard',    icon: 'bi-grid-1x2-fill',  roles: ['Admin','Cashier'] },
-  { to: '/products',     label: 'Products',     icon: 'bi-box-seam-fill',  roles: ['Admin','Cashier'] },
-  { to: '/pos',          label: 'POS Sale',     icon: 'bi-cart-fill',      roles: ['Admin','Cashier'] },
-  { to: '/transactions', label: 'Transactions', icon: 'bi-receipt-cutoff', roles: ['Admin','Cashier'] },
-  { to: '/branches',     label: 'Branches',     icon: 'bi-building-fill',  roles: ['Admin','Cashier'] },
-  { to: '/reports',      label: 'Reports',      icon: 'bi-bar-chart-fill', roles: ['Admin']           },
-  { to: '/settings',     label: 'Settings',     icon: 'bi-gear-fill',      roles: ['Admin','Cashier'] },
+  { to: '/app/dashboard',    label: 'Dashboard',    icon: 'bi-grid-1x2-fill',  roles: ['Admin','Cashier'] },
+  { to: '/app/products',     label: 'Products',     icon: 'bi-box-seam-fill',  roles: ['Admin','Cashier'] },
+  { to: '/app/pos',          label: 'POS Sale',     icon: 'bi-cart-fill',      roles: ['Admin','Cashier'] },
+  { to: '/app/orders',       label: 'Online Orders', icon: 'bi-globe2',        roles: ['Admin','Cashier'] }, // Add this
+  { to: '/app/transactions', label: 'Transactions', icon: 'bi-receipt-cutoff', roles: ['Admin','Cashier'] },
+  { to: '/app/branches',     label: 'Branches',     icon: 'bi-building-fill',  roles: ['Admin','Cashier'] },
+  { to: '/app/reports',      label: 'Reports',      icon: 'bi-bar-chart-fill', roles: ['Admin']           },
+  { to: '/app/settings',     label: 'Settings',     icon: 'bi-gear-fill',      roles: ['Admin','Cashier'] },
 ]
 
 export default function MainLayout() {
@@ -108,6 +108,17 @@ export default function MainLayout() {
           /* Mini footer — just icons */
           <div className="flex flex-col items-center gap-2">
             <ThemeToggle compact />
+            
+            {/* Back to Site - Mini version */}
+            <Link
+              to="/"
+              title="Back to Site"
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-white/30
+                hover:bg-primary/20 hover:text-primary transition-all border-0 bg-transparent cursor-pointer"
+            >
+              <i className="bi bi-house-door text-sm" />
+            </Link>
+            
             <button
               onClick={() => { logout(); navigate('/login') }}
               title="Logout"
@@ -124,6 +135,22 @@ export default function MainLayout() {
               </span>
               <ThemeToggle compact />
             </div>
+            
+            {/* Back to Site Link - Full version */}
+            <Link 
+              to="/" 
+              className="flex items-center gap-2.5 bg-white/[0.04] rounded-xl px-3 py-2.5 mb-2 no-underline hover:bg-white/10 transition-all group"
+            >
+              <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-primary/30 transition-all">
+                <i className="bi bi-house-door text-primary text-sm" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-white text-[12px] font-bold truncate">Back to Site</div>
+                <div className="text-[10px] text-white/40 truncate">Public homepage</div>
+              </div>
+              <i className="bi bi-box-arrow-up-right text-white/20 text-[10px] mr-1" />
+            </Link>
+            
             <div className="flex items-center gap-2.5 bg-white/[0.04] rounded-xl px-3 py-2.5">
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center
                 text-[13px] font-black text-white flex-shrink-0">
@@ -137,7 +164,7 @@ export default function MainLayout() {
                 </div>
               </div>
               <div className="flex gap-1 flex-shrink-0">
-                <NavLink to="/settings" title="Settings"
+                <NavLink to="/app/settings" title="Settings"
                   className={({ isActive }) =>
                     `w-7 h-7 flex items-center justify-center rounded-lg transition-all
                     cursor-pointer text-sm no-underline

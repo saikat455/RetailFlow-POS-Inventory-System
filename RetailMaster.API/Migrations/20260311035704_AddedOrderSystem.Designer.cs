@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using POSSystem.Data;
@@ -11,9 +12,11 @@ using POSSystem.Data;
 namespace POSSystem.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260311035704_AddedOrderSystem")]
+    partial class AddedOrderSystem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -175,9 +178,6 @@ namespace POSSystem.Migrations
                     b.Property<DateTime?>("AcceptedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("AcceptedByUserId")
-                        .HasColumnType("integer");
-
                     b.Property<int?>("BranchId")
                         .HasColumnType("integer");
 
@@ -208,9 +208,6 @@ namespace POSSystem.Migrations
                     b.Property<DateTime?>("DeliveredAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("DeliveredByUserId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("DeliveryAddress")
                         .IsRequired()
                         .HasColumnType("text");
@@ -221,14 +218,11 @@ namespace POSSystem.Migrations
                     b.Property<string>("DeliveryInstructions")
                         .HasColumnType("text");
 
+                    b.Property<decimal>("Discount")
+                        .HasColumnType("numeric");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
-
-                    b.Property<bool>("IsNotified")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime?>("NotifiedAt")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("OrderNumber")
                         .IsRequired()
@@ -242,6 +236,9 @@ namespace POSSystem.Migrations
 
                     b.Property<int>("PaymentStatus")
                         .HasColumnType("integer");
+
+                    b.Property<DateTime?>("PreparedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("ReadyForPickupAt")
                         .HasColumnType("timestamp with time zone");
@@ -263,13 +260,9 @@ namespace POSSystem.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AcceptedByUserId");
-
                     b.HasIndex("BranchId");
 
                     b.HasIndex("CompanyId");
-
-                    b.HasIndex("DeliveredByUserId");
 
                     b.HasIndex("OrderNumber")
                         .IsUnique();
@@ -589,10 +582,6 @@ namespace POSSystem.Migrations
 
             modelBuilder.Entity("POSSystem.Models.OnlineOrder", b =>
                 {
-                    b.HasOne("POSSystem.Models.User", "AcceptedByUser")
-                        .WithMany()
-                        .HasForeignKey("AcceptedByUserId");
-
                     b.HasOne("POSSystem.Models.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
@@ -604,22 +593,14 @@ namespace POSSystem.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("POSSystem.Models.User", "DeliveredByUser")
-                        .WithMany()
-                        .HasForeignKey("DeliveredByUserId");
-
                     b.HasOne("POSSystem.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.Navigation("AcceptedByUser");
-
                     b.Navigation("Branch");
 
                     b.Navigation("Company");
-
-                    b.Navigation("DeliveredByUser");
 
                     b.Navigation("User");
                 });

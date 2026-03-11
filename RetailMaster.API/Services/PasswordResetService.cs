@@ -61,19 +61,23 @@ namespace POSSystem.Services
                 return (true, "If your email exists in our system, you'll receive a reset link.");
             }
 
-            // Check if company is active
-            if (user.Company != null && (!user.Company.IsActive || user.Company.IsDeleted))
-            {
-                return (false, "Your company account is inactive. Please contact support.");
-            }
-
-            // Delete any existing unused tokens for this user
-            var existingTokens = await _db.PasswordResets
-                .Where(pr => pr.UserId == user.Id && !pr.IsUsed && pr.ExpiresAt > DateTime.UtcNow)
-                .ToListAsync();
             
-            _db.PasswordResets.RemoveRange(existingTokens);
-            await _db.SaveChangesAsync();
+// Check if company is active
+if (user.Company != null && (!user.Company.IsActive || user.Company.IsDeleted))
+{
+    return (false, "Your company account is inactive. Please contact support.");
+}
+
+// Delete any existing unused tokens for this user
+var existingTokens = await _db.PasswordResets
+    .Where(pr => pr.UserId == user.Id && !pr.IsUsed && pr.ExpiresAt > DateTime.UtcNow)
+    .ToListAsync();
+            
+            if (existingTokens.Any())  // Add this null check
+{
+    _db.PasswordResets.RemoveRange(existingTokens);
+    await _db.SaveChangesAsync();
+}
 
             // Create new token
             var token = GenerateToken();

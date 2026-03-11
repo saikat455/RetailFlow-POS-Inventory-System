@@ -28,6 +28,9 @@ builder.Services.AddScoped<SaleService>();
 builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<SalesReportService>();
 builder.Services.AddScoped<SettingsService>();
+builder.Services.AddScoped<OnlineOrderService>();
+builder.Services.AddScoped<OrderManagementService>();
+
 // Add Email Service
 builder.Services.AddScoped<IEmailService, EmailService>();
 // Add Password Reset Service

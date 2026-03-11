@@ -30,7 +30,7 @@
 //     e.preventDefault(); setError(''); setLoading(true)
 //     try {
 //       const r = await api.post('/auth/login', form)
-//       login(r.data); navigate('/dashboard')
+//       login(r.data); navigate('/app/dashboard')
 //     } catch (err) {
 //       setError(err.response?.data?.message || 'Invalid email or password.')
 //     } finally { setLoading(false) }
@@ -44,7 +44,7 @@
 //         setGooglePending({ email: r.data.email, name: r.data.name, idToken })
 //         setGoogleLoading(false); return
 //       }
-//       login(r.data); navigate('/dashboard')
+//       login(r.data); navigate('/app/dashboard')
 //     } catch (err) {
 //       setError(err.response?.data?.message || 'Google sign-in failed.')
 //     } finally { setGoogleLoading(false) }
@@ -70,7 +70,7 @@
 //       const r = await api.post('/auth/google', {
 //         idToken: googlePending.idToken, inviteCode,
 //       })
-//       login(r.data); navigate('/dashboard')
+//       login(r.data); navigate('/app/dashboard')
 //     } catch (err) {
 //       setInviteError(err.response?.data?.message || 'Registration failed.')
 //     } finally { setInviteLoading(false) }
@@ -363,7 +363,7 @@ export default function Login() {
     e.preventDefault(); setError(''); setLoading(true)
     try {
       const r = await api.post('/auth/login', form)
-      login(r.data); navigate('/dashboard')
+      login(r.data); navigate('/app/dashboard')
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid email or password.')
     } finally { setLoading(false) }
@@ -377,7 +377,7 @@ export default function Login() {
         setGooglePending({ email: r.data.email, name: r.data.name, idToken })
         setGoogleLoading(false); return
       }
-      login(r.data); navigate('/dashboard')
+      login(r.data); navigate('/app/dashboard')
     } catch (err) {
       setError(err.response?.data?.message || 'Google sign-in failed.')
     } finally { setGoogleLoading(false) }
@@ -401,7 +401,7 @@ export default function Login() {
     setInviteLoading(true)
     try {
       const r = await api.post('/auth/google', { idToken: googlePending.idToken, inviteCode })
-      login(r.data); navigate('/dashboard')
+      login(r.data); navigate('/app/dashboard')
     } catch (err) {
       setInviteError(err.response?.data?.message || 'Registration failed.')
     } finally { setInviteLoading(false) }
