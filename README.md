@@ -2,6 +2,67 @@
 
 A comprehensive Point of Sale (POS) system with multi-branch support, inventory management, online ordering, and role-based access control.
 
+## 📸 Screenshots
+
+### Landing Page
+![Landing Page](Screenshots/Dashboard.jpeg)
+
+### Sign In
+![Sign In](Screenshots/Sign_in.jpeg)
+
+### Sign Up
+![Sign Up](Screenshots/Sign_up.jpeg)
+
+### Company Creation
+![Company Creation](Screenshots/Company_creation.jpeg)
+
+### Company Details
+![Company Details](Screenshots/Company_details.jpeg)
+
+### Dashboard
+![Dashboard](Screenshots/Admin_Dashboard.jpeg)
+
+### Products
+![Products](Screenshots/Product.jpeg)
+
+### POS Sale
+![POS Sale](Screenshots/POS_Sale.jpeg)
+
+### Transactions
+![Transactions](Screenshots/Transaction.jpeg)
+
+### Invoice Print
+![Invoice Print](Screenshots/Print.jpeg)
+
+### Online Order
+![Online Order](Screenshots/Online_order.jpeg)
+
+### Online Order Branch
+![Online Order Branch](Screenshots/Online_order_branch.jpeg)
+
+### Order Details
+![Order Details](Screenshots/Order_details.jpeg)
+
+### Order Details 2
+![Order Details 2](Screenshots/Order_details_2.jpeg)
+
+### Order Approve
+![Order Approve](Screenshots/Order_approve.jpeg)
+
+### Branches
+![Branches](Screenshots/Branch.jpeg)
+
+### Reports
+![Reports](Screenshots/Report.jpeg)
+
+### Profile
+![Profile](Screenshots/Profile.jpeg)
+
+### Settings
+![Settings](Screenshots/Settings.jpeg)
+
+---
+
 ## 🚀 Features
 
 ### Core POS Features
